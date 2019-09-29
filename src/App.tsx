@@ -1,29 +1,41 @@
 import React from "react";
-import { Layer, LayerProps, Map, Marker, Popup } from "remapgl";
+import { Layer, Map, Marker, Popup } from "remapgl";
 import styled from "@emotion/styled";
-
-let count = 0;
+import { LayerProps } from "remapgl/dist/layer/layer";
 
 const App: React.FC = () => {
   const [layers, setLayers] = React.useState(layerData);
-
   React.useEffect(() => {
     setTimeout(() => {
-      count++;
-      console.log(`swap layers ${count}`);
       const [a, b] = layers;
       setLayers([b, a]);
     }, 3000);
   }, [layers]);
 
-  console.log(`layer order=${layers.map(x => x.id).join(", ")}`);
+  const [location, setLocation] = React.useState<{ center: [number, number]; zoom: number; }>({ center: [-68.2954881, 44.3420759], zoom: 9.5 });
+  const centers = React.useRef<[number, number][]>([[-68.8008887, 44.5591077], [-68.5923347, 44.434114], [-68.2954881, 44.3420759]]);
+  React.useEffect(() => {
+    setTimeout(() => {
+      const [a, ...rest] = centers.current;
+      centers.current = [...rest, a];
+      setLocation({
+        center: a,
+        zoom: location.zoom === 9.5 ? 11 : 9.5
+      });
+    }, 3500);
+  }, [location]);
+
+  const { center, zoom } = location;
 
   return (
     <MapStyled
       accessToken="pk.eyJ1IjoicmxtY25lYXJ5MiIsImEiOiJjajgyZjJuMDAyajJrMndzNmJqZDFucTIzIn0.BYE_k7mYhhVCdLckWeTg0g"
+      center={center}
+      motionType="ease"
+      zoom={zoom}
     >
       <Marker
-        location={[-68.2954881, 44.3420759]}
+        location={center}
         popup={() => <Popup closeButton offset={100}>I'm a popup</Popup>}
         showPopup={[ "click", "hover" ]}
       />
