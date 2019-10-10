@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { Layer, Map, Marker, Popup } from "remapgl";
 import styled from "@emotion/styled";
-import { LayerProps } from "remapgl/dist/layer/layer";
+import { LayerProps } from "remapgl/dist/layer/mapboxgl/layer-types";
 import { LngLat } from "remapgl/dist/types/location";
 import { MarkerProps } from "remapgl/dist/marker/marker-types";
 
@@ -79,114 +79,114 @@ function createPopup() {
   return <Popup offset={40}>I'm a popup.</Popup>
 }
 
-const data = {
-  "features": [
+const data: any = {
+  features: [
     {
-      "geometry": {
-        "coordinates": [
+      geometry: {
+        coordinates: [
           -68.18928528,
           44.32134247
         ],
-        "type": "Point"
+        type: "Point"
       },
-      "properties": {
-        "title": "Thunder Hole"
+      properties: {
+        title: "Thunder Hole"
       },
-      "type": "Feature"
+      type: "Feature"
     },
     {
-      "geometry": {
-        "coordinates": [
+      geometry: {
+        coordinates: [
           -68.18968201,
           44.31101227
         ],
-        "type": "Point"
+        type: "Point"
       },
-      "properties": {
-        "title": "Otter Cliff"
+      properties: {
+        title: "Otter Cliff"
       },
-      "type": "Feature"
+      type: "Feature"
     },
     {
-      "geometry": {
-        "coordinates": [
+      geometry: {
+        coordinates: [
           -68.19212177,
           44.31437683
         ],
-        "type": "Point"
+        type: "Point"
       },
-      "properties": {
-        "title": "Fabbri Picnic Area"
+      properties: {
+        title: "Fabbri Picnic Area"
       },
-      "type": "Feature"
+      type: "Feature"
     },
     {
-      "geometry": {
-        "coordinates": [
+      geometry: {
+        coordinates: [
           -68.184021,
           44.32995987
         ],
-        "type": "Point"
+        type: "Point"
       },
-      "properties": {
-        "title": "Sand Beach"
+      properties: {
+        title: "Sand Beach"
       },
-      "type": "Feature"
+      type: "Feature"
     },
     {
-      "geometry": {
-        "coordinates": [
+      geometry: {
+        coordinates: [
           -68.20548248,
           44.38788986
         ],
-        "type": "Point"
+        type: "Point"
       },
-      "properties": {
-        "title": "Village Green"
+      properties: {
+        title: "Village Green"
       },
-      "type": "Feature"
+      type: "Feature"
     },
     {
-      "geometry": {
-        "coordinates": [
+      geometry: {
+        coordinates: [
           -68.232262,
           44.379589
         ],
-        "type": "Point"
+        type: "Point"
       },
-      "properties": {
-        "title": "Cadillac N Ridge"
+      properties: {
+        title: "Cadillac N Ridge"
       },
-      "type": "Feature"
+      type: "Feature"
     },
     {
-      "geometry": {
-        "coordinates": [
+      geometry: {
+        coordinates: [
           -68.20748138,
           44.36243439
         ],
-        "type": "Point"
+        type: "Point"
       },
-      "properties": {
-        "title": "Sieur De Monts"
+      properties: {
+        title: "Sieur De Monts"
       },
-      "type": "Feature"
+      type: "Feature"
     },
     {
-      "geometry": {
-        "coordinates": [
+      geometry: {
+        coordinates: [
           -68.191312,
           44.307236
         ],
-        "type": "Point"
+        type: "Point"
       },
-      "properties": {
-        "title": "Otter Point"
+      properties: {
+        title: "Otter Point"
       },
-      "type": "Feature"
+      type: "Feature"
     }
   ],
-  "type": "FeatureCollection"
+  type: "FeatureCollection"
 };
 
 const paint = {
@@ -206,12 +206,14 @@ const paint = {
 const layerData: LayerProps[] = [
   {
     id: "black",
+    onMouseover: () => console.log("black layer"),
     paint,
     source: { data, type: "geojson" },
     type: "circle"
   },
   {
     id: "red",
+    onMouseover: () => console.log("red layer"),
     paint: { ...paint, "circle-color": "#F22" },
     source: { data, type: "geojson" },
     type: "circle"
