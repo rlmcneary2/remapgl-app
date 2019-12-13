@@ -3,7 +3,12 @@ import { Layer, Map, Marker, Popup } from "remapgl";
 import styled from "@emotion/styled";
 import { LayerProps } from "remapgl/dist/layer/mapboxgl/layer-types";
 import { LngLat } from "remapgl/dist/types/location";
-import { MarkerProps } from "remapgl/dist/marker/marker-types";
+import { MarkerProps } from "remapgl/dist/map/component/marker/marker-types";
+import { PopupProps, MarkerPopupProps } from "remapgl/dist/map/component/popup/popup-types";
+
+interface MyMarkerProps extends MarkerProps {
+  key: string;
+}
 
 const App: React.FC = () => {
   const [layers, setLayers] = React.useState(layerData);
@@ -15,7 +20,7 @@ const App: React.FC = () => {
   // }, [layers]);
 
   const [location, setLocation] = React.useState<{ center: [number, number]; zoom: number; }>({ center: [-68.2954881, 44.3420759], zoom: 9.5 });
-  const [markers, setMarkers] = React.useState<Partial<MarkerProps>[]>([]);
+  const [markers, setMarkers] = React.useState<Partial<MyMarkerProps>[]>([]);
   const centers = React.useRef<[number, number][]>([[-68.8008887, 44.5591077], [-68.5923347, 44.434114], [-68.2954881, 44.3420759]]);
   // React.useEffect(() => {
   //   setTimeout(() => {
@@ -28,19 +33,47 @@ const App: React.FC = () => {
   //   }, 3500);
   // }, [location]);
 
+  React.useEffect(() => {
+    // const popup = createPopup();
+    const marker: Partial<MyMarkerProps> = { draggable: true, location: [-68.18968201, 44.31101227], key: `${Date.now()}`, popup: createPopup() };
+    // const marker: Partial<MyMarkerProps> = { draggable: true, location: [-68.18968201, 44.31101227], key: `${Date.now()}` };
+    setMarkers([...markers, marker]);
+  }, []);
+
+  // React.useEffect(() => {
+  //   setTimeout(() => {
+  //     console.log(`timeout markers ${markers.length}`);
+  //     if (markers.length) {
+  //       const [_, ...nextMarkers] = markers;
+  //       setMarkers(nextMarkers);
+  //     }
+  //   }, 5000);
+  // }, [markers]);
+
   const { center, zoom } = location;
 
+  console.log(`render markers ${markers.length}`);
   return (
     <MapStyled
       accessToken="pk.eyJ1IjoicmxtY25lYXJ5MiIsImEiOiJjajgyZjJuMDAyajJrMndzNmJqZDFucTIzIn0.BYE_k7mYhhVCdLckWeTg0g"
       center={center}
       motionType="ease"
-      onClick={({ lngLat }) => setMarkers([...markers, { draggable: true, location: lngLat, popup: createPopup }])}
+      onClick={({ lngLat }) => setMarkers([...markers, { draggable: true, location: lngLat, key: `${Date.now()}`, popup: createPopup() }])}
       zoom={zoom}
     >
-      {markers.map(x => (
-        createMarker(x)
-      ))}
+      {markers.map(x => {
+        // return createMarker(x);
+        const {location, ...props} = x;
+        let result;
+        try {
+          // result = location ? <Marker {...props} location={location} /> : null;
+          result = location ? <Marker {...props} location={location}><div style={{ background: "pink", height: "50px", width: "50px" }} /></Marker> : null;
+        } catch (err) {
+          console.log("err=", err);
+          debugger;
+        }
+        return result;
+      })}
       {layers.map(x => (
         <Layer key={x.id} {...x} />
       ))}
@@ -55,10 +88,10 @@ const MapStyled = styled(Map)`
   width: 100vw;
 `;
 
-function ClickToggleMarker(props: MarkerProps): JSX.Element {
-  const [popup, setPopup] = useState(false);
-  return (<Marker {...props} onClick={() => setPopup(!popup)} togglePopup={popup} />);
-}
+// function ClickToggleMarker(props: MarkerProps): JSX.Element {
+//   const [popup, setPopup] = useState(false);
+//   return (<Marker {...props} onClick={() => setPopup(!popup)} onDrag={() => console.log("drag3")} togglePopup={popup} />);
+// }
 
 function createMarker(props: Partial<MarkerProps>): JSX.Element | null {
   const { location, ...otherProps } = props;
@@ -66,17 +99,26 @@ function createMarker(props: Partial<MarkerProps>): JSX.Element | null {
     return null;
   }
 
-  return (
-    <ClickToggleMarker
-      key={Array.isArray(location) ? `${location[0]}${location[1]}` : `${location.lat}${location.lat}`}
-      {...otherProps}
-      location={location}
-    />
-  );
+  // return (
+  //   <ClickToggleMarker
+  //     key={Array.isArray(location) ? `${location[0]}${location[1]}` : `${location.lat}${location.lat}`}
+  //     {...otherProps}
+  //     location={location}
+  //   />
+  // );
+
+  return <Marker
+    key={Array.isArray(location) ? `${location[0]}${location[1]}` : `${location.lat}${location.lat}`}
+    {...otherProps}
+    location={location}
+  />
 }
 
 function createPopup() {
-  return <Popup offset={40}>I'm a popup.</Popup>
+  const props = {
+    offset: 40
+  };
+  return <Popup {...props as any}><div style={{ background: "black", color: "white", margin: "20px" }}>I'm a REAL popup.</div></Popup>
 }
 
 const data: any = {
@@ -204,13 +246,13 @@ const paint = {
 };
 
 const layerData: LayerProps[] = [
-  {
-    id: "black",
-    onMouseover: () => console.log("black layer"),
-    paint,
-    source: { data, type: "geojson" },
-    type: "circle"
-  },
+  // {
+  //   id: "black",
+  //   onMouseover: () => console.log("black layer"),
+  //   paint,
+  //   source: { data, type: "geojson" },
+  //   type: "circle"
+  // },
   {
     id: "red",
     onMouseover: () => console.log("red layer"),
